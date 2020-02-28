@@ -682,7 +682,7 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
             # Save the graphics
             
             #save_results_to = '/Users/S/Desktop/Results/'
-            f_name = resultsDir + 'TE_analysis' + str(sourceName) + '_Vs_' + str(sinkName) +'.pdf'
+            f_name = resultsDir + 'TE_analysis' + str(sourceName) + '_Vs_' + str(sinkName) +'.png'
             plt.savefig(f_name, dpi=150)        
             plt.close(fH) # close it with out displaying
             
@@ -871,7 +871,7 @@ def RunNewTE2VarsSer2(DataMatrix, LabelCell, shift, SinkNodes=None, SourceNodes=
             # Save the graphics
             
             #save_results_to = '/Users/S/Desktop/Results/'
-            f_name = resultsDir + 'TE_analysis' + str(sourceName) + '_Vs_' + str(sinkName) +'.pdf'
+            f_name = resultsDir + 'TE_analysis' + str(sourceName) + '_Vs_' + str(sinkName) +'.png'
             plt.savefig(f_name, dpi=150)        
             plt.close(fH) # close it with out displaying
             
