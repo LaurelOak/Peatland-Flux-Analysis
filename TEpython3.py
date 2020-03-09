@@ -5,6 +5,7 @@
 # 
 #       (MatLab version written by Laurel L. and modified by Dino B. Translation to Python by Edom M.)
 # (Updated 2/25/20 by Laurel to accept inputs with NaNs.) 
+# Subsequent major update on 3/9/20 by Laurel L. to calculate the TE significance threshold on M rather than Mshort. Previously, the truncated dataset (Mshort) was reshuffled and then relagged, which shortened the dataset further. Now, the data are shuffled and then resampled, lagged, and truncated as in the calculation of TE on the full dataset. Thus, different datapoints may go into the computation of TE for the shuffled probability distribution, but the number of datapoints is the same as in the original TE calculation. 
 #
 # The following functions are included in this module:
 # 
@@ -292,7 +293,6 @@ def transen_new(M, lag, nbins):
     #  M4 becomes [source_lagged(1:n-lag), sink_unlagged(lag:n), sink_lagged(1:n-lag)]  => H(Xt-T, Yt, Yt-T)
     
     M4[np.argwhere(np.isnan(np.sum(M4,axis=1))), :] = np.nan # Reset rows with any NaN entry to NaN.
-    M4short = M4[np.argwhere(~np.isnan(np.sum(M4,axis=1))),:] # Time series without NaN that will be passed on for shuffling.
     
     M1 = M4[:,(0,2)]  # [source_lagged(1:n-lag), sink_lagged(1:n-lag)]  =>H(Xt-T,Yt-T)
     M2 = M4[:,(1,2)] # [sink_unlagged(lag:n), sink_lagged(1:n-lag)]    =>H(Yt,Yt-T)
@@ -328,7 +328,7 @@ def transen_new(M, lag, nbins):
     
     N = min([n_valid_pairs1, n_valid_pairs2, n_valid_pairs4]) # Number of valid matched pairs used in the calculation
     
-    return T, N, M4short
+    return T, N
     
 
 
@@ -347,7 +347,6 @@ def transen_new2(M, shift, nbins): # with shift as an input different lags btwee
     #  M4 becomes [source_lagged(1:n-lag), sink_unlagged(lag:n), sink_lagged(1:n-lag)]  => H(Xt-T, Yt, Yt-T)
     
     M4[np.argwhere(np.isnan(np.sum(M4,axis=1))), :] = np.nan # Reset rows with any NaN entry to NaN.
-    M4short = M4[np.argwhere(~np.isnan(np.sum(M4,axis=1))),:] # Time series without NaN that will be passed on for shuffling.
     
     M1 = M4[:,(0,2)]  # [source_lagged(1:n-lag), sink_lagged(1:n-lag)]  =>H(Xt-T,Yt-T)
     M2 = M4[:,(1,2)] # [sink_unlagged(lag:n), sink_lagged(1:n-lag)]    =>H(Yt,Yt-T)
@@ -383,7 +382,7 @@ def transen_new2(M, shift, nbins): # with shift as an input different lags btwee
     
     N = min([n_valid_pairs1, n_valid_pairs2, n_valid_pairs4]) # Number of valid matched pairs used in the calculation
     
-    return T, N, M4short
+    return T, N
     
 
 
@@ -650,12 +649,10 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
             Tcrit = copy.deepcopy(T) # Initialize the vector of the critical TE
                         
             for lag in range(maxLag): #[0 to 364] in a year i.e., no lag day
-                t, N, Mshort = transen_new(M=M, lag=lag, nbins=numBins) # Computes TE for at a given lag of 'lag'
-                #print(Mshort, type(Mshort),Mshort.shape)
-                Mshort = Mshort.reshape(Mshort.shape[0],Mshort.shape[2])
+                t, N = transen_new(M=M, lag=lag, nbins=numBins) # Computes TE for at a given lag of 'lag'
                 if N >= minSamples: # enough length to compute TE
                     T[lag] = t      # save TE computed
-                    Tcrit[lag] = transen_crit_new(M=Mshort, alpha= sigLevel, lag=lag, nbins=numBins,numiter=numShuffles) # TE critical
+                    Tcrit[lag] = transen_crit_new(M=M, alpha= sigLevel, lag=lag, nbins=numBins,numiter=numShuffles) # TE critical
                 print(lag, mySinkIter, mySourceIter)    
             
             # Save the first and biggest value of T over the significance threshold
@@ -839,12 +836,10 @@ def RunNewTE2VarsSer2(DataMatrix, LabelCell, shift, SinkNodes=None, SourceNodes=
             Tcrit = copy.deepcopy(T) # Initialize the vector of the critical TE
                         
             for lag in range(maxLag): #[0 to 364] in a year i.e., no lag day
-                t, N, Mshort = transen_new2(M=M, shift=[-lag,shift[1],shift[2]], nbins=numBins) # Computes TE for at a given lag of 'lag'
-                #print(Mshort, type(Mshort),Mshort.shape)
-                Mshort = Mshort.reshape(Mshort.shape[0],Mshort.shape[2])
+                t, N = transen_new2(M=M, shift=[-lag,shift[1],shift[2]], nbins=numBins) # Computes TE for at a given lag of 'lag'
                 if N >= minSamples: # enough length to compute TE
                     T[lag] = t      # save TE computed
-                    Tcrit[lag] = transen_crit_new2(M=Mshort, shift=[-lag,shift[1],shift[2]], alpha= sigLevel,nbins=numBins,numiter=numShuffles) # TE critical
+                    Tcrit[lag] = transen_crit_new2(M=M, shift=[-lag,shift[1],shift[2]], alpha= sigLevel,nbins=numBins,numiter=numShuffles) # TE critical
                 print(lag, mySinkIter, mySourceIter)    
             
             # Save the first and biggest value of T over the significance threshold
