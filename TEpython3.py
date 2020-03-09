@@ -400,7 +400,7 @@ def transenshuffle_new(M, lag, nbins):
     
     
     Minput = shuffle(M[:,(0,1)])
-    T, N,c = transen_new(Minput, lag, nbins)# use it but not understood why [0 0 -lag] is used instead of [-lag 0 -lag]
+    T, N = transen_new(Minput, lag, nbins)# use it but not understood why [0 0 -lag] is used instead of [-lag 0 -lag]
    
     
     return T, N
@@ -420,7 +420,7 @@ def transenshuffle_new2(M, shift, nbins):
     
     
     Minput = shuffle(M[:,(0,1)])
-    T, N,c = transen_new2(Minput, shift, nbins)# use it but not understood why [0 0 -lag] is used instead of [-lag 0 -lag]
+    T, N = transen_new2(Minput, shift, nbins)# use it but not understood why [0 0 -lag] is used instead of [-lag 0 -lag]
    
     
     return T, N
