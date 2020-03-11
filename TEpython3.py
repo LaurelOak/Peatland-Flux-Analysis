@@ -656,7 +656,10 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
                     t, N = transen_new2(M=M, shift=[0,0,-1], nbins=numBins) # Computes TE for at a given lag of 'lag'
                 if N >= minSamples: # enough length to compute TE
                     T[lag] = t      # save TE computed
-                    Tcrit[lag] = transen_crit_new(M=M, alpha= sigLevel, lag=lag, nbins=numBins,numiter=numShuffles) # TE critical
+                    if lag > 0:
+                        Tcrit[lag] = transen_crit_new(M=M, alpha= sigLevel, lag=lag, nbins=numBins,numiter=numShuffles) # TE critical
+                    else:
+                        Tcrit[lag] = transen_crit_new2(M=M, shift=[0,0,-1], alpha= sigLevel,nbins=numBins,numiter=numShuffles) # TE critical
                 print(lag, mySinkIter, mySourceIter)    
             
             # Save the first and biggest value of T over the significance threshold
