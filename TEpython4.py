@@ -562,8 +562,9 @@ def transen_crit_new2( M, shift, alpha, numiter, nbins, per):
 # maxLag also takes a lot of time. Number of lag considered. 3*365
 # number of source variables -- 20
 def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, resultsDir = './Results/', 
-                     maxLag=3*365, minSamples=200, numShuffles = 100, sigLevel=0.05, numBins=[11,11,11]):
+                     maxLag=3*365, minSamples=200, numShuffles = 100, sigLevel=0.05, numBins=[11,11,11], do_not_resample=['none']):
     # computes TE assumes a data matrix with time in first columns and vars on others
+    # do_not_resample is a list of variable names not to resample
          
     # Inputs
     # DataMatrix - data matrix with time in the first column
@@ -678,7 +679,11 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
             print('Source node ', mySourceNum-1, sourceName, ':=>',  'Sink node ', mySinkNum, sinkName)
             print('Lag ', 'Sink', 'Source')
             
-            per = PickSampleInterval(Mmysource, maxLag, 0.01) #Pick the sample interval based on autocorrelation. New 3/8/20
+            if sourceName in do_not_resample:
+                per = 1 
+            else:
+                per = PickSampleInterval(np.float64(Mmysource), maxLag, 0.01) #Pick the sample interval based on autocorrelation. New 3/8/20
+            print(per)
             M = np.column_stack((Mmysource, MmySink)) # Source followed by Sink
             M = M.astype('float')
             #print(M.shape)
@@ -754,8 +759,9 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
 # maxLag also takes a lot of time. Number of lag considered. 3*365
 # number of source variables -- 20
 def RunNewTE2VarsSer2(DataMatrix, LabelCell, shift, SinkNodes=None, SourceNodes=None, resultsDir = './Results/',
-                     maxLag=3*365, minSamples=200, numShuffles = 100, sigLevel=0.05, numBins=[11,11,11]):
+                     maxLag=3*365, minSamples=200, numShuffles = 100, sigLevel=0.05, numBins=[11,11,11], do_not_resample=['none']):
     # computes TE assumes a data matrix with time in first columns and vars on others
+    # do_not_resample is a list of variable names not to resample
          
     # Inputs
     # DataMatrix - data matrix with time in the first column
@@ -867,7 +873,10 @@ def RunNewTE2VarsSer2(DataMatrix, LabelCell, shift, SinkNodes=None, SourceNodes=
             print('Source node ', mySourceNum-1, sourceName, ':=>',  'Sink node ', mySinkNum, sinkName)
             print('Lag ', 'Sink', 'Source')
             
-            per = PickSampleInterval(np.float64(Mmysource), maxLag, 0.01) #Pick the sample interval based on autocorrelation. New 3/8/20
+            if sourceName in do_not_resample:
+                per = 1 
+            else:
+                per = PickSampleInterval(np.float64(Mmysource), maxLag, 0.01) #Pick the sample interval based on autocorrelation. New 3/8/20
             print(per)
             
             M = np.column_stack((Mmysource, MmySink)) # Source followed by Sink
