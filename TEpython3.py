@@ -649,7 +649,11 @@ def RunNewTE2VarsSer(DataMatrix, LabelCell, SinkNodes=None, SourceNodes=None, re
             Tcrit = copy.deepcopy(T) # Initialize the vector of the critical TE
                         
             for lag in range(maxLag): #[0 to 364] in a year i.e., no lag day
-                t, N = transen_new(M=M, lag=lag, nbins=numBins) # Computes TE for at a given lag of 'lag'
+                #For the zero lag, condition the TE on sink behavior at t-1. 
+                if lag > 0:
+                    t, N = transen_new(M=M, lag=lag, nbins=numBins) # Computes TE for at a given lag of 'lag'
+                else: 
+                    t, N = transen_new2(M=M, shift=[0,0,-1], nbins=numBins) # Computes TE for at a given lag of 'lag'
                 if N >= minSamples: # enough length to compute TE
                     T[lag] = t      # save TE computed
                     Tcrit[lag] = transen_crit_new(M=M, alpha= sigLevel, lag=lag, nbins=numBins,numiter=numShuffles) # TE critical
